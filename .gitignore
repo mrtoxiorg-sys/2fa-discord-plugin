@@ -1,0 +1,20 @@
+.classpath
+.project
+.settings/*
+.idea
+/bin/
+.idea
+out
+.gradle
+*.iml
+build
+*.log
+*.tmp
+
+# Exclude run except natives
+!run/
+run/*
+!run/natives/
+
+# Plugin runtime data
+*.db
