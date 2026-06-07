@@ -2,10 +2,10 @@
  * Created by: [TheToxi_LSD]
  * Edited by: [TheToxi_LSD]
  */
-package dev.toxi.aurion2fa.bot;
+package dev.toxi.twofa.bot;
 
-import dev.toxi.aurion2fa.Aurion2fa;
-import dev.toxi.aurion2fa.service.AuthService;
+import dev.toxi.twofa.TwoFactorPlugin;
+import dev.toxi.twofa.service.AuthService;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -25,10 +25,10 @@ import java.util.UUID;
 
 public final class DiscordButtonListener extends ListenerAdapter {
 
-    private final Aurion2fa plugin;
+    private final TwoFactorPlugin plugin;
     private final AuthService authService;
 
-    public DiscordButtonListener(final Aurion2fa plugin, final AuthService authService) {
+    public DiscordButtonListener(final TwoFactorPlugin plugin, final AuthService authService) {
         this.plugin = plugin;
         this.authService = authService;
     }

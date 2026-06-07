@@ -2,34 +2,42 @@
  * Created by: [TheToxi_LSD]
  * Edited by: [TheToxi_LSD]
  */
-package dev.toxi.aurion2fa.database;
+package dev.toxi.twofa.database;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import dev.toxi.aurion2fa.Aurion2fa;
+import dev.toxi.twofa.TwoFactorPlugin;
 
 import java.io.File;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Locale;
 import java.util.logging.Level;
 
 public final class DatabaseManager {
 
-    private final Aurion2fa plugin;
+    private static final String USERS_TABLE = "twofa_users";
+    private static final String BANS_TABLE = "twofa_bans";
+    private static final String LEGACY_USERS_TABLE = "aurion_2fa_users";
+    private static final String LEGACY_BANS_TABLE = "aurion_2fa_bans";
+
+    private final TwoFactorPlugin plugin;
     private HikariDataSource dataSource;
 
-    public DatabaseManager(final Aurion2fa plugin) {
+    public DatabaseManager(final TwoFactorPlugin plugin) {
         this.plugin = plugin;
     }
 
     // Инициализация пула соединений
     public boolean initialize() {
         final var config = plugin.getConfigManager().getConfig();
-        final String type = config.getString("database.type", "sqlite").toLowerCase();
+        final String type = getDatabaseType();
 
         final HikariConfig hikariConfig = new HikariConfig();
-        hikariConfig.setPoolName("Aurion2FA-Pool");
+        hikariConfig.setPoolName("2FA-Pool");
 
         // Настройки тайм-аутов пула
         hikariConfig.setMaximumPoolSize(10);
@@ -46,7 +54,7 @@ public final class DatabaseManager {
             // Поддержка внешних СУБД (MySQL / PostgreSQL / MariaDB)
             final String host = config.getString("database.host", "localhost");
             final int port = config.getInt("database.port", 3306);
-            final String database = config.getString("database.database", "aurion2fa");
+            final String database = config.getString("database.database", "twofa");
             final String username = config.getString("database.username", "root");
             final String password = config.getString("database.password", "");
             final boolean useSSL = config.getBoolean("database.use-ssl", false);
@@ -81,14 +89,14 @@ public final class DatabaseManager {
     // Создание таблиц при запуске
     private void createTables() {
         final String usersTable = """
-                CREATE TABLE IF NOT EXISTS aurion_2fa_users (
+                CREATE TABLE IF NOT EXISTS twofa_users (
                     uuid VARCHAR(36) PRIMARY KEY,
                     discord_id VARCHAR(20) NOT NULL UNIQUE,
                     linked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 );""";
 
         final String bansTable = """
-                CREATE TABLE IF NOT EXISTS aurion_2fa_bans (
+                CREATE TABLE IF NOT EXISTS twofa_bans (
                     uuid VARCHAR(36) PRIMARY KEY,
                     banned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 );""";
@@ -98,6 +106,7 @@ public final class DatabaseManager {
 
             stmt.execute(usersTable);
             stmt.execute(bansTable);
+            migrateLegacyTables(conn);
 
             if (plugin.getConfigManager().getConfig().getBoolean("debug", false)) {
                 plugin.getLogger().info("[DEBUG] Базы данных проверены/созданы успешно.");
@@ -111,6 +120,55 @@ public final class DatabaseManager {
     public void close() {
         if (this.dataSource != null && !this.dataSource.isClosed()) {
             this.dataSource.close();
+        }
+    }
+
+    public String getUsersTableName() {
+        return USERS_TABLE;
+    }
+
+    public String getBansTableName() {
+        return BANS_TABLE;
+    }
+
+    private String getDatabaseType() {
+        return plugin.getConfigManager().getConfig().getString("database.type", "sqlite").toLowerCase(Locale.ROOT);
+    }
+
+    private void migrateLegacyTables(final Connection connection) {
+        try (final Statement stmt = connection.createStatement()) {
+            if (tableExists(connection, LEGACY_USERS_TABLE) && isTableEmpty(connection, USERS_TABLE)) {
+                stmt.executeUpdate("INSERT INTO " + USERS_TABLE + " (uuid, discord_id, linked_at) SELECT uuid, discord_id, linked_at FROM " + LEGACY_USERS_TABLE);
+                plugin.getLogger().info("Найдены старые данные 2FA: связи аккаунтов перенесены в новую схему.");
+            }
+
+            if (tableExists(connection, LEGACY_BANS_TABLE) && isTableEmpty(connection, BANS_TABLE)) {
+                stmt.executeUpdate("INSERT INTO " + BANS_TABLE + " (uuid, banned_at) SELECT uuid, banned_at FROM " + LEGACY_BANS_TABLE);
+                plugin.getLogger().info("Найдены старые данные 2FA: блокировки перенесены в новую схему.");
+            }
+        } catch (SQLException e) {
+            plugin.getLogger().log(Level.WARNING, "Не удалось выполнить миграцию старых таблиц 2FA.", e);
+        }
+    }
+
+    private boolean tableExists(final Connection connection, final String tableName) throws SQLException {
+        final DatabaseMetaData metaData = connection.getMetaData();
+        if (hasTable(metaData, tableName)) {
+            return true;
+        }
+        return hasTable(metaData, tableName.toUpperCase(Locale.ROOT));
+    }
+
+    private boolean hasTable(final DatabaseMetaData metaData, final String tableName) throws SQLException {
+        try (final ResultSet rs = metaData.getTables(null, null, tableName, new String[]{"TABLE"})) {
+            return rs.next();
+        }
+    }
+
+    private boolean isTableEmpty(final Connection connection, final String tableName) throws SQLException {
+        try (final Statement stmt = connection.createStatement();
+             final ResultSet rs = stmt.executeQuery("SELECT 1 FROM " + tableName + " LIMIT 1")) {
+            return !rs.next();
         }
     }
 }

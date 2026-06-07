@@ -2,9 +2,9 @@
  * Created by: [TheToxi_LSD]
  * Edited by: [TheToxi_LSD]
  */
-package dev.toxi.aurion2fa.config;
+package dev.toxi.twofa.config;
 
-import dev.toxi.aurion2fa.Aurion2fa;
+import dev.toxi.twofa.TwoFactorPlugin;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -17,7 +17,7 @@ import java.util.logging.Level;
 
 public final class ConfigManager {
 
-    private final Aurion2fa plugin;
+    private final TwoFactorPlugin plugin;
 
     private FileConfiguration config;
     private FileConfiguration pluginLocale;
@@ -27,7 +27,7 @@ public final class ConfigManager {
     private final File pluginLocaleFile;
     private final File discordLocaleFile;
 
-    public ConfigManager(final Aurion2fa plugin) {
+    public ConfigManager(final TwoFactorPlugin plugin) {
         this.plugin = plugin;
         this.configFile = new File(plugin.getDataFolder(), "config.yml");
         this.pluginLocaleFile = new File(plugin.getDataFolder(), "plugin_locale.yml");

@@ -2,11 +2,11 @@
  * Created by: [TheToxi_LSD]
  * Edited by: [TheToxi_LSD]
  */
-package dev.toxi.aurion2fa.service;
+package dev.toxi.twofa.service;
 
-import dev.toxi.aurion2fa.Aurion2fa;
-import dev.toxi.aurion2fa.database.UserDao;
-import dev.toxi.aurion2fa.model.AuthSession;
+import dev.toxi.twofa.TwoFactorPlugin;
+import dev.toxi.twofa.database.UserDao;
+import dev.toxi.twofa.model.AuthSession;
 
 import java.time.Instant;
 import java.util.Map;
@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public final class AuthService {
 
-    private final Aurion2fa plugin;
+    private final TwoFactorPlugin plugin;
     private final UserDao userDao;
 
     // Сессии авторизации (UUID -> Сессия), TTL настраивается в config.yml
@@ -33,7 +33,7 @@ public final class AuthService {
     // Кэш статуса привязки во время входа (UUID -> Имеет ли привязку к ДС)
     private final Map<UUID, Boolean> linkStatusCache = new ConcurrentHashMap<>();
 
-    public AuthService(final Aurion2fa plugin) {
+    public AuthService(final TwoFactorPlugin plugin) {
         this.plugin = plugin;
         this.userDao = new UserDao(plugin);
 

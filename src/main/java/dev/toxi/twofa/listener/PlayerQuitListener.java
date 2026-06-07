@@ -2,10 +2,10 @@
  * Created by: [TheToxi_LSD]
  * Edited by: [TheToxi_LSD]
  */
-package dev.toxi.aurion2fa.listener;
+package dev.toxi.twofa.listener;
 
-import dev.toxi.aurion2fa.Aurion2fa;
-import dev.toxi.aurion2fa.service.AuthService;
+import dev.toxi.twofa.TwoFactorPlugin;
+import dev.toxi.twofa.service.AuthService;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;

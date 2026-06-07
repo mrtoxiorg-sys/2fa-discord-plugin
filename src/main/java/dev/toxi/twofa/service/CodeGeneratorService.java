@@ -2,10 +2,10 @@
  * Created by: [TheToxi_LSD]
  * Edited by: [TheToxi_LSD]
  */
-package dev.toxi.aurion2fa.service;
+package dev.toxi.twofa.service;
 
-import dev.toxi.aurion2fa.Aurion2fa;
-import dev.toxi.aurion2fa.model.LinkCode;
+import dev.toxi.twofa.TwoFactorPlugin;
+import dev.toxi.twofa.model.LinkCode;
 
 import java.security.SecureRandom;
 import java.time.Duration;
@@ -17,13 +17,13 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public final class CodeGeneratorService {
 
-    private final Aurion2fa plugin;
+    private final TwoFactorPlugin plugin;
     // Безопасный генератор случайных чисел
     private final SecureRandom random = new SecureRandom();
     // Хранилище кодов в оперативной памяти (Потокобезопасное)
     private final Map<String, LinkCode> activeCodes = new ConcurrentHashMap<>();
 
-    public CodeGeneratorService(final Aurion2fa plugin) {
+    public CodeGeneratorService(final TwoFactorPlugin plugin) {
         this.plugin = plugin;
 
         // Запуск асинхронного шедулера для очистки кэша раз в 30 секунд

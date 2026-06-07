@@ -2,11 +2,10 @@
  * Created by: [TheToxi_LSD]
  * Edited by: [TheToxi_LSD]
  */
-package dev.toxi.aurion2fa.command;
+package dev.toxi.twofa.command;
 
-import dev.toxi.aurion2fa.Aurion2fa;
-import dev.toxi.aurion2fa.bot.DiscordEmbedService;
-import net.kyori.adventure.text.Component;
+import dev.toxi.twofa.TwoFactorPlugin;
+import dev.toxi.twofa.bot.DiscordEmbedService;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -24,42 +23,47 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-public final class Aurion2faCommand implements CommandExecutor, TabCompleter {
+public final class TwoFactorCommand implements CommandExecutor, TabCompleter {
 
-    private final Aurion2fa plugin;
+    private static final String ENABLE_PERMISSION = "2fa.command.enable";
+    private static final String DISABLE_PERMISSION = "2fa.command.disable";
+    private static final String UNBLOCK_PERMISSION = "2fa.command.unblock";
+    private static final String RELOAD_PERMISSION = "2fa.command.reload";
+
+    private final TwoFactorPlugin plugin;
     private final MiniMessage miniMessage = MiniMessage.miniMessage();
 
-    public Aurion2faCommand(final Aurion2fa plugin) {
+    public TwoFactorCommand(final TwoFactorPlugin plugin) {
         this.plugin = plugin;
     }
 
     @Override
     public boolean onCommand(@NotNull final CommandSender sender, @NotNull final Command command, @NotNull final String label, @NotNull final String[] args) {
         if (args.length == 0) {
-            sendLocaleMessage(sender, "messages.no-permission");
+            sendHelp(sender);
             return true;
         }
 
         final String subCommand = args[0].toLowerCase();
 
         switch (subCommand) {
-            case "link" -> handleLink(sender);
-            case "unlink" -> handleUnlink(sender, args);
-            case "unban" -> handleUnban(sender, args);
+            case "enable", "link" -> handleEnable(sender);
+            case "disable", "unlink" -> handleDisable(sender, args);
+            case "unblock", "unban" -> handleUnblock(sender, args);
             case "reload" -> handleReload(sender);
-            default -> sendLocaleMessage(sender, "messages.player-not-found");
+            default -> sendHelp(sender);
         }
 
         return true;
     }
 
-    private void handleLink(final CommandSender sender) {
+    private void handleEnable(final CommandSender sender) {
         if (!(sender instanceof Player player)) {
             sendLocaleMessage(sender, "messages.only-players");
             return;
         }
 
-        if (!player.hasPermission("aurion2fa.command.link")) {
+        if (!player.hasPermission(ENABLE_PERMISSION)) {
             sendLocaleMessage(player, "messages.no-permission");
             return;
         }
@@ -82,14 +86,14 @@ public final class Aurion2faCommand implements CommandExecutor, TabCompleter {
         });
     }
 
-    private void handleUnlink(final CommandSender sender, final String[] args) {
-        if (!sender.hasPermission("aurion2fa.command.unlink")) {
+    private void handleDisable(final CommandSender sender, final String[] args) {
+        if (!sender.hasPermission(DISABLE_PERMISSION)) {
             sendLocaleMessage(sender, "messages.no-permission");
             return;
         }
 
         if (args.length < 2) {
-            sender.sendMessage(miniMessage.deserialize("<red>Использование: /aurion2fa unlink <player/uuid/discord_id>"));
+            sender.sendMessage(miniMessage.deserialize("<red>Использование: /2fa disable <player/uuid/discord_id>"));
             return;
         }
 
@@ -141,14 +145,14 @@ public final class Aurion2faCommand implements CommandExecutor, TabCompleter {
         });
     }
 
-    private void handleUnban(final CommandSender sender, final String[] args) {
-        if (!sender.hasPermission("aurion2fa.command.unban")) {
+    private void handleUnblock(final CommandSender sender, final String[] args) {
+        if (!sender.hasPermission(UNBLOCK_PERMISSION)) {
             sendLocaleMessage(sender, "messages.no-permission");
             return;
         }
 
         if (args.length < 2) {
-            sender.sendMessage(miniMessage.deserialize("<red>Использование: /aurion2fa unban <player/uuid/discord_id>"));
+            sender.sendMessage(miniMessage.deserialize("<red>Использование: /2fa unblock <player/uuid/discord_id>"));
             return;
         }
 
@@ -199,7 +203,7 @@ public final class Aurion2faCommand implements CommandExecutor, TabCompleter {
     }
 
     private void handleReload(final CommandSender sender) {
-        if (!sender.hasPermission("aurion2fa.command.reload")) {
+        if (!sender.hasPermission(RELOAD_PERMISSION)) {
             sendLocaleMessage(sender, "messages.no-permission");
             return;
         }
@@ -223,6 +227,25 @@ public final class Aurion2faCommand implements CommandExecutor, TabCompleter {
         sender.sendMessage(miniMessage.deserialize(rawMessage));
     }
 
+    private void sendHelp(final CommandSender sender) {
+        final List<String> lines = new ArrayList<>();
+        lines.add("<gradient:#4FD6FF:#D7F4FA>[2FA]</gradient> <white>Доступные команды:");
+        if (sender.hasPermission(ENABLE_PERMISSION) && sender instanceof Player) {
+            lines.add("<gray>-</gray> <white>/2fa enable <gray>— включить защиту через Discord");
+        }
+        if (sender.hasPermission(DISABLE_PERMISSION)) {
+            lines.add("<gray>-</gray> <white>/2fa disable <player/uuid/discord_id> <gray>— отключить 2FA");
+        }
+        if (sender.hasPermission(UNBLOCK_PERMISSION)) {
+            lines.add("<gray>-</gray> <white>/2fa unblock <player/uuid/discord_id> <gray>— снять блокировку");
+        }
+        if (sender.hasPermission(RELOAD_PERMISSION)) {
+            lines.add("<gray>-</gray> <white>/2fa reload <gray>— перезагрузить плагин");
+        }
+
+        lines.forEach(line -> sender.sendMessage(miniMessage.deserialize(line)));
+    }
+
     private boolean isUuid(final String str) {
         try {
             UUID.fromString(str);
@@ -236,10 +259,10 @@ public final class Aurion2faCommand implements CommandExecutor, TabCompleter {
     public @Nullable List<String> onTabComplete(@NotNull final CommandSender sender, @NotNull final Command command, @NotNull final String alias, @NotNull final String[] args) {
         if (args.length == 1) {
             final List<String> completions = new ArrayList<>();
-            if (sender.hasPermission("aurion2fa.command.link")) completions.add("link");
-            if (sender.hasPermission("aurion2fa.command.unlink")) completions.add("unlink");
-            if (sender.hasPermission("aurion2fa.command.unban")) completions.add("unban");
-            if (sender.hasPermission("aurion2fa.command.reload")) completions.add("reload");
+            if (sender.hasPermission(ENABLE_PERMISSION) && sender instanceof Player) completions.add("enable");
+            if (sender.hasPermission(DISABLE_PERMISSION)) completions.add("disable");
+            if (sender.hasPermission(UNBLOCK_PERMISSION)) completions.add("unblock");
+            if (sender.hasPermission(RELOAD_PERMISSION)) completions.add("reload");
             return filterCompletions(completions, args[0]);
         }
         return Collections.emptyList();

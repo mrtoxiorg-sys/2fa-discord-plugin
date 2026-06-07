@@ -1,9 +1,9 @@
 # ========================================== #
-#          Aurion2FA Plugin Locale           #
+#             2FA Plugin Locale              #
 # ========================================== #
 
 # Префикс плагина, используемый в сообщениях
-prefix: '<gradient:#4FD6FF:#D7F4FA>[ᴀᴜʀɪᴏɴ]</gradient> '
+prefix: '<gradient:#4FD6FF:#D7F4FA>[2FA]</gradient> '
 
 messages:
   # Общие системные сообщения и ошибки
@@ -16,12 +16,12 @@ messages:
   configs-reloaded: '%prefix%<gradient:#4FD6FF:#D7F4FA>Успешно →</gradient> <white>Конфигурация
     плагина перезагружена!'
 
-  # Процесс привязки (/aurion2fa link)
+  # Включение защиты (/2fa enable)
   already-linked: '%prefix%<gradient:#FF4F4F:#FAD7D7>Ошибка →</gradient> <white>Ваш
     аккаунт уже привязан к Discord 2FA!'
   link-code-received: '%prefix%<gradient:#4FD6FF:#D7F4FA>Привязка →</gradient> <white>Ваш
     временный код: <gradient:#4FD6FF:#D7F4FA><bold>%code%</bold></gradient>. Отправьте
-    его в ЛС боту (2FA#7475). Действует 1 минуту.'
+    его боту в личные сообщения. Действует 1 минуту.'
   link-success: '%prefix%<gradient:#4FD6FF:#D7F4FA>Привязка →</gradient> <white>Вы
     успешно связали этот аккаунт со своим Discord!'
 
@@ -35,25 +35,25 @@ messages:
 
   # Причины отключения (кика) от сервера
   banned-kick: |-
-    <gradient:#FF4F4F:#FAD7D7>ᴀᴜʀɪᴏɴ</gradient>
+    <gradient:#FF4F4F:#FAD7D7>2FA</gradient>
     <white>Ваш игровой аккаунт временно <gradient:#FF4F4F:#FAD7D7>заблокирован владельцем через Discord 2FA.
     <gray>Для разблокировки обратитесь в поддержку.
   auth-kick-reason: |-
-    <gradient:#FF4F4F:#FAD7D7>ᴀᴜʀɪᴏɴ</gradient>
+    <gradient:#FF4F4F:#FAD7D7>2FA</gradient>
     <gradient:#4FD6FF:#D7F4FA>Ваш вход на сервер был отклонен через 2FA дискорд бота.
   auth-kick-blocked: |-
-    <gradient:#FF4F4F:#FAD7D7>ᴀᴜʀɪᴏɴ</gradient>
+    <gradient:#FF4F4F:#FAD7D7>2FA</gradient>
 
     <white>Вход на этот аккаунт был <gradient:#FF4F4F:#FAD7D7>заблокирован<white> через 2FA бота.
     <gray>Для разблокировки обратитесь в поддержку.
   dm-failed: |-
-    <gradient:#FF4F4F:#FAD7D7>ᴀᴜʀɪᴏɴ</gradient>
+    <gradient:#FF4F4F:#FAD7D7>2FA</gradient>
 
     <white>Бот не смог отправить вам запрос авторизации.
 
     <gray>Пожалуйста, убедитесь, что у вас <yellow>открыты личные сообщения</yellow> для пользователей общего сервера Discord, и попробуйте войти снова.
   bot-not-ready: |-
-    <gradient:#FF4F4F:#FAD7D7>ᴀᴜʀɪᴏɴ</gradient>
+    <gradient:#FF4F4F:#FAD7D7>2FA</gradient>
 
     <white>Система защиты 2FA еще запускается после старта сервера.
 

@@ -2,29 +2,30 @@
  * Created by: [TheToxi_LSD]
  * Edited by: [TheToxi_LSD]
  */
-package dev.toxi.aurion2fa.database;
+package dev.toxi.twofa.database;
 
-import dev.toxi.aurion2fa.Aurion2fa;
+import dev.toxi.twofa.TwoFactorPlugin;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Level;
 
 public final class UserDao {
 
-    private final Aurion2fa plugin;
+    private final TwoFactorPlugin plugin;
 
-    public UserDao(final Aurion2fa plugin) {
+    public UserDao(final TwoFactorPlugin plugin) {
         this.plugin = plugin;
     }
 
     // Получение Discord ID по UUID игрока
     public Optional<String> getDiscordId(final UUID uuid) {
-        final String sql = "SELECT discord_id FROM aurion_2fa_users WHERE uuid = ?;";
+        final String sql = "SELECT discord_id FROM " + usersTable() + " WHERE uuid = ?;";
         try (final Connection conn = plugin.getDatabaseManager().getConnection();
              final PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -42,7 +43,7 @@ public final class UserDao {
 
     // Получение UUID игрока по Discord ID
     public Optional<UUID> getMinecraftUuid(final String discordId) {
-        final String sql = "SELECT uuid FROM aurion_2fa_users WHERE discord_id = ?;";
+        final String sql = "SELECT uuid FROM " + usersTable() + " WHERE discord_id = ?;";
         try (final Connection conn = plugin.getDatabaseManager().getConnection();
              final PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -60,8 +61,10 @@ public final class UserDao {
 
     // Создание связки игрока и Discord-аккаунта
     public boolean linkUser(final UUID uuid, final String discordId) {
-        final String sql = "INSERT INTO aurion_2fa_users (uuid, discord_id) VALUES (?, ?) ON CONFLICT(uuid) DO UPDATE SET discord_id = EXCLUDED.discord_id;";
-        // Примечание: ON CONFLICT синтаксис поддерживается в SQLite и PostgreSQL. Для MySQL в продакшене мы адаптируем запрос, если потребуется.
+        final String sql = switch (databaseType()) {
+            case "mysql", "mariadb" -> "INSERT INTO " + usersTable() + " (uuid, discord_id) VALUES (?, ?) ON DUPLICATE KEY UPDATE discord_id = VALUES(discord_id), linked_at = CURRENT_TIMESTAMP;";
+            default -> "INSERT INTO " + usersTable() + " (uuid, discord_id) VALUES (?, ?) ON CONFLICT(uuid) DO UPDATE SET discord_id = excluded.discord_id, linked_at = CURRENT_TIMESTAMP;";
+        };
         try (final Connection conn = plugin.getDatabaseManager().getConnection();
              final PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -76,7 +79,7 @@ public final class UserDao {
 
     // Удаление связки по UUID
     public boolean unlinkUser(final UUID uuid) {
-        final String sql = "DELETE FROM aurion_2fa_users WHERE uuid = ?;";
+        final String sql = "DELETE FROM " + usersTable() + " WHERE uuid = ?;";
         try (final Connection conn = plugin.getDatabaseManager().getConnection();
              final PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -90,7 +93,7 @@ public final class UserDao {
 
     // Удаление связки по Discord ID
     public boolean unlinkUserByDiscordId(final String discordId) {
-        final String sql = "DELETE FROM aurion_2fa_users WHERE discord_id = ?;";
+        final String sql = "DELETE FROM " + usersTable() + " WHERE discord_id = ?;";
         try (final Connection conn = plugin.getDatabaseManager().getConnection();
              final PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -104,7 +107,7 @@ public final class UserDao {
 
     // Проверка наличия игрока в бане плагина
     public boolean isBanned(final UUID uuid) {
-        final String sql = "SELECT 1 FROM aurion_2fa_bans WHERE uuid = ?;";
+        final String sql = "SELECT 1 FROM " + bansTable() + " WHERE uuid = ?;";
         try (final Connection conn = plugin.getDatabaseManager().getConnection();
              final PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -120,7 +123,10 @@ public final class UserDao {
 
     // Блокировка игрока на стороне плагина
     public boolean banUser(final UUID uuid) {
-        final String sql = "INSERT OR IGNORE INTO aurion_2fa_bans (uuid) VALUES (?);";
+        final String sql = switch (databaseType()) {
+            case "mysql", "mariadb" -> "INSERT IGNORE INTO " + bansTable() + " (uuid) VALUES (?);";
+            default -> "INSERT INTO " + bansTable() + " (uuid) VALUES (?) ON CONFLICT(uuid) DO NOTHING;";
+        };
         try (final Connection conn = plugin.getDatabaseManager().getConnection();
              final PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -134,7 +140,7 @@ public final class UserDao {
 
     // Разблокировка игрока по его UUID
     public boolean unbanUser(final UUID uuid) {
-        final String sql = "DELETE FROM aurion_2fa_bans WHERE uuid = ?;";
+        final String sql = "DELETE FROM " + bansTable() + " WHERE uuid = ?;";
         try (final Connection conn = plugin.getDatabaseManager().getConnection();
              final PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -148,7 +154,7 @@ public final class UserDao {
 
     // Разблокировка игрока по Discord ID (находит UUID по связи и удаляет бан)
     public boolean unbanUserByDiscordId(final String discordId) {
-        final String sql = "DELETE FROM aurion_2fa_bans WHERE uuid = (SELECT uuid FROM aurion_2fa_users WHERE discord_id = ?);";
+        final String sql = "DELETE FROM " + bansTable() + " WHERE uuid = (SELECT uuid FROM " + usersTable() + " WHERE discord_id = ?);";
         try (final Connection conn = plugin.getDatabaseManager().getConnection();
              final PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -158,5 +164,17 @@ public final class UserDao {
             plugin.getLogger().log(Level.SEVERE, "Ошибка при разблокировке через Discord ID: " + discordId, e);
             return false;
         }
+    }
+
+    private String usersTable() {
+        return plugin.getDatabaseManager().getUsersTableName();
+    }
+
+    private String bansTable() {
+        return plugin.getDatabaseManager().getBansTableName();
+    }
+
+    private String databaseType() {
+        return plugin.getConfigManager().getConfig().getString("database.type", "sqlite").toLowerCase(Locale.ROOT);
     }
 }

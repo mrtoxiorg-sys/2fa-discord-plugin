@@ -2,11 +2,11 @@
  * Created by: [TheToxi_LSD]
  * Edited by: [TheToxi_LSD]
  */
-package dev.toxi.aurion2fa.bot;
+package dev.toxi.twofa.bot;
 
-import dev.toxi.aurion2fa.Aurion2fa;
-import dev.toxi.aurion2fa.service.AuthService;
-import dev.toxi.aurion2fa.service.CodeGeneratorService;
+import dev.toxi.twofa.TwoFactorPlugin;
+import dev.toxi.twofa.service.AuthService;
+import dev.toxi.twofa.service.CodeGeneratorService;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -23,13 +23,13 @@ import java.util.logging.Level;
 
 public final class DiscordBotManager {
 
-    private final Aurion2fa plugin;
+    private final TwoFactorPlugin plugin;
     private final AuthService authService;
     private final CodeGeneratorService codeGenerator;
 
     private JDA jda;
 
-    public DiscordBotManager(final Aurion2fa plugin, final AuthService authService, final CodeGeneratorService codeGenerator) {
+    public DiscordBotManager(final TwoFactorPlugin plugin, final AuthService authService, final CodeGeneratorService codeGenerator) {
         this.plugin = plugin;
         this.authService = authService;
         this.codeGenerator = codeGenerator;
@@ -44,7 +44,7 @@ public final class DiscordBotManager {
         }
 
         // ИСПРАВЛЕНО: Используем оригинальный пакет до этапа релокации (shading).
-        // Сборщик автоматически заменит этот путь на dev.toxi.aurion2fa.libs.jda во время компиляции.
+        // Сборщик автоматически заменит этот путь на dev.toxi.twofa.libs.jda во время компиляции.
         net.dv8tion.jda.internal.utils.JDALogger.setFallbackLoggerEnabled(false);
 
         // Запуск в отдельном потоке, чтобы не блокировать загрузку сервера Minecraft

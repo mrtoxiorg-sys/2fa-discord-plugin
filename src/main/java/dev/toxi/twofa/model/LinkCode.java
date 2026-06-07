@@ -2,7 +2,7 @@
  * Created by: [TheToxi_LSD]
  * Edited by: [TheToxi_LSD]
  */
-package dev.toxi.aurion2fa.model;
+package dev.toxi.twofa.model;
 
 import java.time.Instant;
 import java.util.UUID;

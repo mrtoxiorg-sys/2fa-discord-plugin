@@ -2,11 +2,11 @@
  * Created by: [TheToxi_LSD]
  * Edited by: [TheToxi_LSD]
  */
-package dev.toxi.aurion2fa.bot;
+package dev.toxi.twofa.bot;
 
-import dev.toxi.aurion2fa.Aurion2fa;
-import dev.toxi.aurion2fa.service.AuthService;
-import dev.toxi.aurion2fa.service.CodeGeneratorService;
+import dev.toxi.twofa.TwoFactorPlugin;
+import dev.toxi.twofa.service.AuthService;
+import dev.toxi.twofa.service.CodeGeneratorService;
 import net.dv8tion.jda.api.entities.channel.ChannelType; // Измененный путь импорта в JDA 5.x
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 
 public final class DiscordMessageListener extends ListenerAdapter {
 
-    private final Aurion2fa plugin;
+    private final TwoFactorPlugin plugin;
     private final AuthService authService;
     private final CodeGeneratorService codeGenerator;
     private final DiscordBotManager botManager;
@@ -29,7 +29,7 @@ public final class DiscordMessageListener extends ListenerAdapter {
     // Регулярное выражение для поиска ровно 4 цифр
     private final Pattern codePattern = Pattern.compile("^[0-9]{4}$");
 
-    public DiscordMessageListener(final Aurion2fa plugin, final AuthService authService, final CodeGeneratorService codeGenerator, final DiscordBotManager botManager) {
+    public DiscordMessageListener(final TwoFactorPlugin plugin, final AuthService authService, final CodeGeneratorService codeGenerator, final DiscordBotManager botManager) {
         this.plugin = plugin;
         this.authService = authService;
         this.codeGenerator = codeGenerator;

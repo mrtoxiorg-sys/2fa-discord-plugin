@@ -2,24 +2,24 @@
  * Created by: [TheToxi_LSD]
  * Edited by: [TheToxi_LSD]
  */
-package dev.toxi.aurion2fa;
+package dev.toxi.twofa;
 
-import dev.toxi.aurion2fa.bot.DiscordBotManager;
-import dev.toxi.aurion2fa.command.Aurion2faCommand;
-import dev.toxi.aurion2fa.config.ConfigManager;
-import dev.toxi.aurion2fa.database.DatabaseManager;
-import dev.toxi.aurion2fa.listener.PlayerFreezeListener;
-import dev.toxi.aurion2fa.listener.PlayerJoinListener;
-import dev.toxi.aurion2fa.listener.PlayerQuitListener;
-import dev.toxi.aurion2fa.service.AuthService;
-import dev.toxi.aurion2fa.service.CodeGeneratorService;
+import dev.toxi.twofa.bot.DiscordBotManager;
+import dev.toxi.twofa.command.TwoFactorCommand;
+import dev.toxi.twofa.config.ConfigManager;
+import dev.toxi.twofa.database.DatabaseManager;
+import dev.toxi.twofa.listener.PlayerFreezeListener;
+import dev.toxi.twofa.listener.PlayerJoinListener;
+import dev.toxi.twofa.listener.PlayerQuitListener;
+import dev.toxi.twofa.service.AuthService;
+import dev.toxi.twofa.service.CodeGeneratorService;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.logging.Level;
 
-public final class Aurion2fa extends JavaPlugin {
+public final class TwoFactorPlugin extends JavaPlugin {
 
-    private static Aurion2fa instance;
+    private static TwoFactorPlugin instance;
 
     private ConfigManager configManager;
     private DatabaseManager databaseManager;
@@ -57,7 +57,7 @@ public final class Aurion2fa extends JavaPlugin {
         // 6. Регистрация команд
         registerCommands();
 
-        getLogger().info("Плагин Aurion2FA успешно запущен и интегрирован!");
+        getLogger().info("Плагин 2FA успешно запущен и готов к работе.");
     }
 
     @Override
@@ -72,7 +72,7 @@ public final class Aurion2fa extends JavaPlugin {
             this.databaseManager.close();
         }
 
-        getLogger().info("Плагин Aurion2FA успешно выключен.");
+        getLogger().info("Плагин 2FA успешно выключен.");
     }
 
     /**
@@ -112,15 +112,15 @@ public final class Aurion2fa extends JavaPlugin {
     }
 
     private void registerCommands() {
-        final Aurion2faCommand mainCommand = new Aurion2faCommand(this);
-        final var pluginCommand = getCommand("aurion2fa");
+        final TwoFactorCommand mainCommand = new TwoFactorCommand(this);
+        final var pluginCommand = getCommand("2fa");
         if (pluginCommand != null) {
             pluginCommand.setExecutor(mainCommand);
             pluginCommand.setTabCompleter(mainCommand);
         }
     }
 
-    public static Aurion2fa getInstance() {
+    public static TwoFactorPlugin getInstance() {
         return instance;
     }
 

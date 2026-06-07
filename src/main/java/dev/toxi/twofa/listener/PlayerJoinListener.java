@@ -2,11 +2,11 @@
  * Created by: [TheToxi_LSD]
  * Edited by: [TheToxi_LSD]
  */
-package dev.toxi.aurion2fa.listener;
+package dev.toxi.twofa.listener;
 
-import dev.toxi.aurion2fa.Aurion2fa;
-import dev.toxi.aurion2fa.bot.DiscordEmbedService;
-import dev.toxi.aurion2fa.service.AuthService;
+import dev.toxi.twofa.TwoFactorPlugin;
+import dev.toxi.twofa.bot.DiscordEmbedService;
+import dev.toxi.twofa.service.AuthService;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
@@ -20,11 +20,11 @@ import java.util.UUID;
 
 public final class PlayerJoinListener implements Listener {
 
-    private final Aurion2fa plugin;
+    private final TwoFactorPlugin plugin;
     private final AuthService authService;
     private final MiniMessage miniMessage = MiniMessage.miniMessage();
 
-    public PlayerJoinListener(final Aurion2fa plugin, final AuthService authService) {
+    public PlayerJoinListener(final TwoFactorPlugin plugin, final AuthService authService) {
         this.plugin = plugin;
         this.authService = authService;
     }

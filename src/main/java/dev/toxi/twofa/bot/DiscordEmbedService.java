@@ -2,9 +2,9 @@
  * Created by: [TheToxi_LSD]
  * Edited by: [TheToxi_LSD]
  */
-package dev.toxi.aurion2fa.bot;
+package dev.toxi.twofa.bot;
 
-import dev.toxi.aurion2fa.Aurion2fa;
+import dev.toxi.twofa.TwoFactorPlugin;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -29,7 +29,7 @@ public final class DiscordEmbedService {
     /**
      * Создает Embed-запрос на авторизацию 2FA (Вход на сервер) с интерактивными кнопками.
      */
-    public static MessageCreateData createAuthRequest(final Aurion2fa plugin, final UUID uuid, final String playerName, final String ip) {
+    public static MessageCreateData createAuthRequest(final TwoFactorPlugin plugin, final UUID uuid, final String playerName, final String ip) {
         final FileConfiguration locale = plugin.getConfigManager().getDiscordLocale();
 
         final String path = "auth-request.";
@@ -67,7 +67,7 @@ public final class DiscordEmbedService {
     /**
      * Одноцветный информационный Embed (например, успешная привязка, бан и т.д.)
      */
-    public static MessageCreateData createSimpleEmbed(final Aurion2fa plugin, final String configPath, final String... placeholders) {
+    public static MessageCreateData createSimpleEmbed(final TwoFactorPlugin plugin, final String configPath, final String... placeholders) {
         final FileConfiguration locale = plugin.getConfigManager().getDiscordLocale();
 
         String title = locale.getString(configPath + ".title", "Уведомление");
