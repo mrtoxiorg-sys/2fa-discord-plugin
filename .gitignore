@@ -1,0 +1,12 @@
+/.gradle/
+/build/
+/out/
+/.idea/
+*.iml
+
+# Local runtime artifacts
+*.log
+*.tmp
+
+# Plugin runtime data
+database.db

@@ -1,5 +1,5 @@
 # ========================================== #
-#             Aurion2FA Config               #
+#                2FA Config                  #
 # ========================================== #
 
 
@@ -10,7 +10,7 @@ database:
   # Данные подключения (игнорируются, если тип sqlite)
   host: "localhost"
   port: 3306
-  database: "aurion2fa"
+  database: "twofa"
   username: "root"
   password: ""
   use-ssl: false

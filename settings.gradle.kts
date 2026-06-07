@@ -1,1 +1,1 @@
-rootProject.name = "aurion2fa"
+rootProject.name = "2fa"
