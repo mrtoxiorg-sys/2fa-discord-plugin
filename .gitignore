@@ -1,12 +1,20 @@
-/.gradle/
-/build/
-/out/
-/.idea/
+.classpath
+.project
+.settings/*
+.idea
+/bin/
+.idea
+out
+.gradle
 *.iml
-
-# Local runtime artifacts
+build
 *.log
 *.tmp
 
+# Exclude run except natives
+!run/
+run/*
+!run/natives/
+
 # Plugin runtime data
-database.db
+*.db
