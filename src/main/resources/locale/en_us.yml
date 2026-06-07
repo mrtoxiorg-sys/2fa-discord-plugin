@@ -1,0 +1,126 @@
+prefix: '<green>[2FA]</green> <gray>'
+
+messages:
+  no-permission: '%prefix%<red>Error:</red> <gray>You do not have permission.</gray>'
+  only-players: '%prefix%<red>Error:</red> <gray>This command is only available to players.</gray>'
+  player-not-found: '%prefix%<red>Error:</red> <gray>Unknown subcommand or player not found.</gray>'
+  configs-reloaded: '%prefix%<green>Done:</green> <gray>Configuration reloaded successfully.</gray>'
+
+  already-linked: '%prefix%<red>Error:</red> <gray>Your account is already linked to Discord 2FA.</gray>'
+  link-code-received: '%prefix%<green>Link:</green> <gray>Your verification code is <green><bold>%code%</bold></green>. Send it to the bot in Discord DMs. It expires in 1 minute.</gray>'
+  link-success: '%prefix%<green>Linked:</green> <gray>Your Minecraft account is now linked to Discord.</gray>'
+
+  auth-required: '%prefix%<green>Confirm:</green> <gray>Approve this login in Discord.</gray>'
+  auth-success: '%prefix%<green>Success:</green> <gray>Your login was confirmed. Enjoy the game.</gray>'
+  actions-blocked: '%prefix%<red>Error:</red> <gray>You cannot do that until 2FA is completed.</gray>'
+
+  banned-kick: |-
+    <red>[2FA]</red>
+
+    <gray>Your account has been blocked through Discord 2FA.</gray>
+    <gray>Please contact support to restore access.</gray>
+  auth-kick-reason: |-
+    <red>[2FA]</red>
+
+    <gray>Your login was denied through Discord.</gray>
+  auth-kick-blocked: |-
+    <red>[2FA]</red>
+
+    <gray>This account has been blocked through Discord 2FA.</gray>
+    <gray>Please contact support to restore access.</gray>
+  dm-failed: |-
+    <red>[2FA]</red>
+
+    <gray>The bot could not send you a Discord message.</gray>
+    <gray>Open your DMs and try logging in again.</gray>
+  bot-not-ready: |-
+    <red>[2FA]</red>
+
+    <gray>The protection system is still starting.</gray>
+    <gray>Please wait about a minute and try again.</gray>
+
+commands:
+  usage:
+    disable: '%prefix%<red>Usage:</red> <gray>/2fa disable [player/uuid/discord_id]</gray>'
+    unblock: '%prefix%<red>Usage:</red> <gray>/2fa unblock [player/uuid/discord_id]</gray>'
+  progress:
+    disable-search: '%prefix%<gray>Searching and disabling the link asynchronously...</gray>'
+    unblock-search: '%prefix%<gray>Searching and unblocking asynchronously...</gray>'
+  result:
+    disable-success-uuid: '%prefix%<green>Done:</green> <gray>2FA link removed by UUID.</gray>'
+    disable-success-discord: '%prefix%<green>Done:</green> <gray>2FA link removed by Discord ID.</gray>'
+    disable-failed: '%prefix%<red>Error:</red> <gray>2FA link was not found or could not be removed.</gray>'
+    unblock-success-uuid: '%prefix%<green>Done:</green> <gray>Account unblocked by UUID.</gray>'
+    unblock-success-discord: '%prefix%<green>Done:</green> <gray>Account unblocked by Discord ID.</gray>'
+    unblock-failed: '%prefix%<red>Error:</red> <gray>Block was not found or could not be removed.</gray>'
+    target-invalid: '%prefix%<red>Error:</red> <gray>Could not resolve the target. The player may have never joined or the ID is invalid.</gray>'
+    target-invalid-short: '%prefix%<red>Error:</red> <gray>Could not resolve the target.</gray>'
+  help:
+    header: '<green>[2FA]</green> <gray>Available commands:</gray>'
+    enable: '<gray>-</gray> <green>/2fa enable</green> <gray>link your Minecraft account with Discord</gray>'
+    disable: '<gray>-</gray> <green>/2fa disable [player/uuid/discord_id]</green> <gray>remove 2FA from a player</gray>'
+    unblock: '<gray>-</gray> <green>/2fa unblock [player/uuid/discord_id]</green> <gray>remove a 2FA block</gray>'
+    reload: '<gray>-</gray> <green>/2fa reload</green> <gray>reload configuration and services</gray>'
+
+discord:
+  messages:
+    database-save-error: 'There was an error while saving your Minecraft account data. Please contact an administrator.'
+  auth-request:
+    title: '2FA Login Request'
+    description: |-
+      Player **%player%** is trying to log into your account.
+
+      **IP Address:** `%ip%`
+
+      If this is not you, deny the login immediately.
+    color: '#22C55E'
+    buttons:
+      approve: 'Approve Login'
+      kick: 'Kick Player'
+      block: 'Block Account'
+  embeds:
+    link-success:
+      title: 'Account Linked'
+      description: |-
+        Your Minecraft account is now linked to your Discord account.
+
+        Future logins will require approval through Discord.
+      color: '#22C55E'
+    link-expired:
+      title: 'Link Failed'
+      description: |-
+        The code was not found or has already expired.
+
+        Run `/2fa enable` in-game again to generate a new code.
+      color: '#EF4444'
+    unlink-notify:
+      title: '2FA Disabled'
+      description: 'An administrator disabled Discord 2FA for your Minecraft account.'
+      color: '#9CA3AF'
+    unban-notify:
+      title: 'Account Unblocked'
+      description: |-
+        An administrator removed the login block from your account.
+
+        You can log in again.
+      color: '#22C55E'
+  interaction:
+    status-field: 'Action status'
+    already-approved:
+      value: 'This login was already approved earlier.'
+      color: '#9CA3AF'
+    approved:
+      value: 'The login for this player was approved successfully.'
+      color: '#22C55E'
+    player-offline:
+      value: 'This request is no longer active because the player has already left the server.'
+      color: '#9CA3AF'
+    kicked:
+      value: 'The player was kicked from the server successfully.'
+      color: '#22C55E'
+    kick-failed-offline:
+      value: 'The player could not be kicked because they are already offline.'
+      color: '#9CA3AF'
+    blocked:
+      value: 'This account was added to the plugin blocklist and login is now denied.'
+      color: '#EF4444'

@@ -35,7 +35,7 @@ public final class PlayerJoinListener implements Listener {
 
         // Сначала проверяем системные баны 2FA
         if (authService.getUserDao().isBanned(uuid)) {
-            final String kickRaw = plugin.getConfigManager().getPluginLocale().getString("messages.banned-kick", "<red>Ваш аккаунт заблокирован через Discord 2FA.");
+            final String kickRaw = plugin.getConfigManager().getLocale().getString("messages.banned-kick", "<red>[2FA]</red>\n<gray>Your account is blocked.</gray>");
             event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_BANNED, miniMessage.deserialize(kickRaw));
             return;
         }
@@ -50,9 +50,9 @@ public final class PlayerJoinListener implements Listener {
             final var botManager = plugin.getDiscordBotManager();
             if (botManager == null || !botManager.isReady()) {
                 authService.clearCachedLinkStatus(uuid);
-                final String notReadyMsg = plugin.getConfigManager().getPluginLocale().getString(
+                final String notReadyMsg = plugin.getConfigManager().getLocale().getString(
                         "messages.bot-not-ready",
-                        "<red>Вход отклонен: Система защиты 2FA еще запускается после старта сервера. Пожалуйста, подождите около минуты и попробуйте зайти снова."
+                        "<red>[2FA]</red>\n<gray>The protection system is still starting. Please try again in about a minute.</gray>"
                 );
                 event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, miniMessage.deserialize(notReadyMsg));
             }
@@ -82,8 +82,8 @@ public final class PlayerJoinListener implements Listener {
         authService.freeze(uuid);
 
         // Информируем в чат Minecraft
-        final String prefix = plugin.getConfigManager().getPluginLocale().getString("prefix", "");
-        final String rawMsg = plugin.getConfigManager().getPluginLocale().getString("messages.auth-required", "%prefix%<gradient:#FF9F4F:#FAD7A7>Внимание →</gradient> <white>Подтвердите вход в Discord!");
+        final String prefix = plugin.getConfigManager().getLocale().getString("prefix", "");
+        final String rawMsg = plugin.getConfigManager().getLocale().getString("messages.auth-required", "%prefix%<green>Confirm:</green> <gray>Approve this login in Discord.</gray>");
         player.sendMessage(miniMessage.deserialize(rawMsg.replace("%prefix%", prefix)));
 
         // Асинхронно достаем Discord ID и отправляем запрос в ЛС
@@ -101,7 +101,7 @@ public final class PlayerJoinListener implements Listener {
             plugin.getDiscordBotManager().sendPrivateMessage(discordId, authRequest).exceptionally(error -> {
                 // ФИКС: Для предотвращения поломки ChunkMap при выходе выполняем kick с задержкой в 1 тик
                 plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
-                    final String rawKickMsg = plugin.getConfigManager().getPluginLocale().getString("messages.dm-failed", "<red>Вход отклонен: Бот не смог отправить вам запрос в ЛС Discord. Пожалуйста, откройте личные сообщения и зайдите снова.");
+                    final String rawKickMsg = plugin.getConfigManager().getLocale().getString("messages.dm-failed", "<red>[2FA]</red>\n<gray>The bot could not send you a Discord message. Open your DMs and try again.</gray>");
                     player.kick(miniMessage.deserialize(rawKickMsg));
 
                     if (plugin.getConfigManager().getConfig().getBoolean("debug", false)) {

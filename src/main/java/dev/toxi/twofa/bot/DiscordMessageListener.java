@@ -63,13 +63,18 @@ public final class DiscordMessageListener extends ListenerAdapter {
                     plugin.getServer().getScheduler().runTask(plugin, () -> {
                         final Player player = Bukkit.getPlayer(uuid);
                         if (player != null && player.isOnline()) {
-                            final String prefix = plugin.getConfigManager().getPluginLocale().getString("prefix", "");
-                            final String rawMsg = plugin.getConfigManager().getPluginLocale().getString("messages.link-success", "%prefix%<gradient:#4FD6FF:#D7F4FA>Успешно →</gradient> <white>Ваш аккаунт привязан к Discord!");
+                            final String prefix = plugin.getConfigManager().getLocale().getString("prefix", "");
+                            final String rawMsg = plugin.getConfigManager().getLocale().getString("messages.link-success", "%prefix%<green>Success:</green> <gray>Your account is now linked to Discord.</gray>");
                             player.sendMessage(MiniMessage.miniMessage().deserialize(rawMsg.replace("%prefix%", prefix)));
                         }
                     });
                 } else {
-                    event.getChannel().sendMessage("Произошла ошибка при сохранении данных в базу данных Minecraft. Обратитесь к администратору.").queue();
+                    event.getChannel().sendMessage(
+                            plugin.getConfigManager().getLocale().getString(
+                                    "discord.messages.database-save-error",
+                                    "There was an error while saving your Minecraft account data. Please contact an administrator."
+                            )
+                    ).queue();
                 }
             });
         }, () -> {

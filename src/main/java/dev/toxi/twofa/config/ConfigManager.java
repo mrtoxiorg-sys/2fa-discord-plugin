@@ -13,25 +13,26 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 import java.util.logging.Level;
 
 public final class ConfigManager {
 
+    private static final String DEFAULT_LOCALE = "en_us";
+
     private final TwoFactorPlugin plugin;
 
     private FileConfiguration config;
-    private FileConfiguration pluginLocale;
-    private FileConfiguration discordLocale;
+    private FileConfiguration locale;
+    private String activeLocale = DEFAULT_LOCALE;
 
     private final File configFile;
-    private final File pluginLocaleFile;
-    private final File discordLocaleFile;
+    private final File localeDirectory;
 
     public ConfigManager(final TwoFactorPlugin plugin) {
         this.plugin = plugin;
         this.configFile = new File(plugin.getDataFolder(), "config.yml");
-        this.pluginLocaleFile = new File(plugin.getDataFolder(), "plugin_locale.yml");
-        this.discordLocaleFile = new File(plugin.getDataFolder(), "discord_locale.yml");
+        this.localeDirectory = new File(plugin.getDataFolder(), "locale");
     }
 
     // Полная перезагрузка или первичная инициализация всех конфигов
@@ -42,8 +43,25 @@ public final class ConfigManager {
         }
 
         this.config = loadSpecificConfig(this.configFile, "config.yml");
-        this.pluginLocale = loadSpecificConfig(this.pluginLocaleFile, "plugin_locale.yml");
-        this.discordLocale = loadSpecificConfig(this.discordLocaleFile, "discord_locale.yml");
+        this.locale = loadLocaleConfig();
+    }
+
+    private FileConfiguration loadLocaleConfig() {
+        if (!localeDirectory.exists()) {
+            localeDirectory.mkdirs();
+        }
+
+        final String requestedLocale = config.getString("locale", DEFAULT_LOCALE).toLowerCase(Locale.ROOT);
+        final String resourceName = "locale/" + requestedLocale + ".yml";
+
+        if (plugin.getResource(resourceName) != null) {
+            this.activeLocale = requestedLocale;
+            return loadSpecificConfig(new File(localeDirectory, requestedLocale + ".yml"), resourceName);
+        }
+
+        plugin.getLogger().warning("Неизвестная локаль '" + requestedLocale + "'. Используется локаль по умолчанию: " + DEFAULT_LOCALE);
+        this.activeLocale = DEFAULT_LOCALE;
+        return loadSpecificConfig(new File(localeDirectory, DEFAULT_LOCALE + ".yml"), "locale/" + DEFAULT_LOCALE + ".yml");
     }
 
     private FileConfiguration loadSpecificConfig(final File file, final String resourceName) {
@@ -73,11 +91,11 @@ public final class ConfigManager {
         return this.config;
     }
 
-    public FileConfiguration getPluginLocale() {
-        return this.pluginLocale;
+    public FileConfiguration getLocale() {
+        return this.locale;
     }
 
-    public FileConfiguration getDiscordLocale() {
-        return this.discordLocale;
+    public String getActiveLocale() {
+        return this.activeLocale;
     }
 }
