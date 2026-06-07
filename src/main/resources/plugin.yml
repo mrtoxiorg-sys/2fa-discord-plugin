@@ -1,0 +1,32 @@
+name: aurion2fa
+description: $description
+version: '${version}'
+
+main: dev.toxi.aurion2fa.Aurion2fa
+api-version: '1.21'
+load: POSTWORLD
+
+authors: [ TheToxi_LSD ]
+website: https://aurionmc.fun
+
+# Регистрация команд сервера
+commands:
+  aurion2fa:
+    description: "Главная команда двухфакторной авторизации Aurion2FA"
+    aliases: [a2fa, 2fa]
+    usage: "/aurion2fa <link|unlink|unban|reload>"
+
+# Описание прав доступа для плагинов разрешений (например, LuckPerms)
+permissions:
+  aurion2fa.command.link:
+    description: "Разрешает игрокам привязывать свой аккаунт к Discord"
+    default: true
+  aurion2fa.command.unlink:
+    description: "Разрешает администраторам отвязывать Discord от аккаунтов игроков"
+    default: op
+  aurion2fa.command.unban:
+    description: "Разрешает администраторам снимать блокировки 2FA"
+    default: op
+  aurion2fa.command.reload:
+    description: "Разрешает администраторам перезагружать плагин и его сервисы"
+    default: op

@@ -1,0 +1,29 @@
+# ========================================== #
+#             Aurion2FA Config               #
+# ========================================== #
+
+
+database:
+  # Поддерживаемые типы: sqlite, mysql, postgresql
+  type: "sqlite"
+
+  # Данные подключения (игнорируются, если тип sqlite)
+  host: "localhost"
+  port: 3306
+  database: "aurion2fa"
+  username: "root"
+  password: ""
+  use-ssl: false
+
+
+discord:
+  # Токен
+  token: "YOUR_BOT_TOKEN_HERE"
+
+# Время действия сессии IP-адреса игрока в секундах.
+# Если игрок перезаходит с того же IP в течение этого времени, подтверждение не запрашивается.
+# По умолчанию: 3600 секунд (1 час).
+session-duration-seconds: 3600
+
+# Режим отладки.
+debug: false
