@@ -4,10 +4,10 @@
 
 
 database:
-  # Поддерживаемые типы: sqlite, mysql, postgresql
+  # Supported types: sqlite, mysql, postgresql
   type: "sqlite"
 
-  # Данные подключения (игнорируются, если тип sqlite)
+  # Connection settings (ignored when sqlite is used)
   host: "localhost"
   port: 3306
   database: "twofa"
@@ -17,13 +17,16 @@ database:
 
 
 discord:
-  # Токен
+  # Bot token
   token: "YOUR_BOT_TOKEN_HERE"
 
-# Время действия сессии IP-адреса игрока в секундах.
-# Если игрок перезаходит с того же IP в течение этого времени, подтверждение не запрашивается.
-# По умолчанию: 3600 секунд (1 час).
+# Active locale. Available values: en_us, ru_ru
+locale: "en_us"
+
+# Player IP session lifetime in seconds.
+# If the player reconnects from the same IP within this time, 2FA is not requested again.
+# Default: 3600 seconds (1 hour).
 session-duration-seconds: 3600
 
-# Режим отладки.
+# Debug mode.
 debug: false

@@ -7,6 +7,7 @@ package dev.toxi.twofa.command;
 import dev.toxi.twofa.TwoFactorPlugin;
 import dev.toxi.twofa.bot.DiscordEmbedService;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
@@ -80,9 +81,7 @@ public final class TwoFactorCommand implements CommandExecutor, TabCompleter {
             // Генерируем 4-значный код (синхронизировано в памяти)
             final String code = plugin.getCodeGeneratorService().generateCode(uuid);
 
-            final String prefix = plugin.getConfigManager().getPluginLocale().getString("prefix", "");
-            final String rawMsg = plugin.getConfigManager().getPluginLocale().getString("messages.link-code-received", "%prefix%<gradient:#4FD6FF:#D7F4FA>Инфо →</gradient> <white>Ваш код привязки: <gradient:#4FD6FF:#D7F4FA><bold>%code%</bold></gradient>. Напишите его боту в ЛС!");
-            player.sendMessage(miniMessage.deserialize(rawMsg.replace("%prefix%", prefix).replace("%code%", code)));
+            sendLocaleMessage(player, "messages.link-code-received", "%code%", code);
         });
     }
 
@@ -93,12 +92,12 @@ public final class TwoFactorCommand implements CommandExecutor, TabCompleter {
         }
 
         if (args.length < 2) {
-            sender.sendMessage(miniMessage.deserialize("<red>Использование: /2fa disable <player/uuid/discord_id>"));
+            sendLocaleMessage(sender, "commands.usage.disable");
             return;
         }
 
         final String target = args[1];
-        sender.sendMessage(miniMessage.deserialize("<yellow>Выполняется асинхронный поиск и отвязка..."));
+        sendLocaleMessage(sender, "commands.progress.disable-search");
 
         CompletableFuture.runAsync(() -> {
             UUID resolvedUuid = null;
@@ -122,10 +121,10 @@ public final class TwoFactorCommand implements CommandExecutor, TabCompleter {
                 plugin.getAuthService().getDiscordIdAsync(finalUuid).thenAccept(optDiscord -> {
                     plugin.getAuthService().unlinkUserAsync(finalUuid).thenAccept(success -> {
                         if (success) {
-                            sender.sendMessage(miniMessage.deserialize("<green>Привязка 2FA успешно удалена по UUID."));
+                            sendLocaleMessage(sender, "commands.result.disable-success-uuid");
                             optDiscord.ifPresent(discordId -> sendDiscordNotification(discordId, "unlink-notify"));
                         } else {
-                            sender.sendMessage(miniMessage.deserialize("<red>Связь 2FA не найдена или не удалось удалить."));
+                            sendLocaleMessage(sender, "commands.result.disable-failed");
                         }
                     });
                 });
@@ -133,14 +132,14 @@ public final class TwoFactorCommand implements CommandExecutor, TabCompleter {
                 final String finalDiscordId = resolvedDiscordId;
                 plugin.getAuthService().unlinkUserByDiscordIdAsync(finalDiscordId).thenAccept(success -> {
                     if (success) {
-                        sender.sendMessage(miniMessage.deserialize("<green>Привязка 2FA успешно удалена по Discord ID."));
+                        sendLocaleMessage(sender, "commands.result.disable-success-discord");
                         sendDiscordNotification(finalDiscordId, "unlink-notify");
                     } else {
-                        sender.sendMessage(miniMessage.deserialize("<red>Связь 2FA не найдена или не удалось удалить."));
+                        sendLocaleMessage(sender, "commands.result.disable-failed");
                     }
                 });
             } else {
-                sender.sendMessage(miniMessage.deserialize("<red>Не удалось распознать цель (игрок никогда не играл или ID невалиден)."));
+                sendLocaleMessage(sender, "commands.result.target-invalid");
             }
         });
     }
@@ -152,12 +151,12 @@ public final class TwoFactorCommand implements CommandExecutor, TabCompleter {
         }
 
         if (args.length < 2) {
-            sender.sendMessage(miniMessage.deserialize("<red>Использование: /2fa unblock <player/uuid/discord_id>"));
+            sendLocaleMessage(sender, "commands.usage.unblock");
             return;
         }
 
         final String target = args[1];
-        sender.sendMessage(miniMessage.deserialize("<yellow>Выполняется асинхронный поиск и разблокировка..."));
+        sendLocaleMessage(sender, "commands.progress.unblock-search");
 
         CompletableFuture.runAsync(() -> {
             UUID resolvedUuid = null;
@@ -178,26 +177,26 @@ public final class TwoFactorCommand implements CommandExecutor, TabCompleter {
                 final UUID finalUuid = resolvedUuid;
                 plugin.getAuthService().unbanUserAsync(finalUuid).thenAccept(success -> {
                     if (success) {
-                        sender.sendMessage(miniMessage.deserialize("<green>Аккаунт разблокирован по UUID."));
+                        sendLocaleMessage(sender, "commands.result.unblock-success-uuid");
                         plugin.getAuthService().getDiscordIdAsync(finalUuid).thenAccept(optDiscord ->
                                 optDiscord.ifPresent(discordId -> sendDiscordNotification(discordId, "unban-notify"))
                         );
                     } else {
-                        sender.sendMessage(miniMessage.deserialize("<red>Блокировка не найдена или не удалось снять."));
+                        sendLocaleMessage(sender, "commands.result.unblock-failed");
                     }
                 });
             } else if (resolvedDiscordId != null) {
                 final String finalDiscordId = resolvedDiscordId;
                 plugin.getAuthService().unbanUserByDiscordIdAsync(finalDiscordId).thenAccept(success -> {
                     if (success) {
-                        sender.sendMessage(miniMessage.deserialize("<green>Аккаунт разблокирован по Discord ID."));
+                        sendLocaleMessage(sender, "commands.result.unblock-success-discord");
                         sendDiscordNotification(finalDiscordId, "unban-notify");
                     } else {
-                        sender.sendMessage(miniMessage.deserialize("<red>Блокировка не найдена или не удалось снять."));
+                        sendLocaleMessage(sender, "commands.result.unblock-failed");
                     }
                 });
             } else {
-                sender.sendMessage(miniMessage.deserialize("<red>Не удалось распознать цель."));
+                sendLocaleMessage(sender, "commands.result.target-invalid-short");
             }
         });
     }
@@ -218,32 +217,41 @@ public final class TwoFactorCommand implements CommandExecutor, TabCompleter {
         plugin.getDiscordBotManager().sendPrivateMessage(discordId, messageData);
     }
 
-    private void sendLocaleMessage(final CommandSender sender, final String path) {
-        final String prefix = plugin.getConfigManager().getPluginLocale().getString("prefix", "");
-        String rawMessage = plugin.getConfigManager().getPluginLocale().getString(path, "");
+    private void sendLocaleMessage(final CommandSender sender, final String path, final String... placeholders) {
+        final FileConfiguration locale = plugin.getConfigManager().getLocale();
+        final String prefix = locale.getString("prefix", "");
+        String rawMessage = locale.getString(path, "");
         if (rawMessage.isEmpty()) return;
 
-        rawMessage = rawMessage.replace("%prefix%", prefix);
+        rawMessage = applyPlaceholders(rawMessage.replace("%prefix%", prefix), placeholders);
         sender.sendMessage(miniMessage.deserialize(rawMessage));
     }
 
     private void sendHelp(final CommandSender sender) {
         final List<String> lines = new ArrayList<>();
-        lines.add("<gradient:#4FD6FF:#D7F4FA>[2FA]</gradient> <white>Доступные команды:");
+        final FileConfiguration locale = plugin.getConfigManager().getLocale();
+        lines.add(locale.getString("commands.help.header", "<green>[2FA]</green> <gray>Available commands:</gray>"));
         if (sender.hasPermission(ENABLE_PERMISSION) && sender instanceof Player) {
-            lines.add("<gray>-</gray> <white>/2fa enable <gray>— включить защиту через Discord");
+            lines.add(locale.getString("commands.help.enable", "<gray>- /2fa enable</gray>"));
         }
         if (sender.hasPermission(DISABLE_PERMISSION)) {
-            lines.add("<gray>-</gray> <white>/2fa disable <player/uuid/discord_id> <gray>— отключить 2FA");
+            lines.add(locale.getString("commands.help.disable", "<gray>- /2fa disable [player/uuid/discord_id]</gray>"));
         }
         if (sender.hasPermission(UNBLOCK_PERMISSION)) {
-            lines.add("<gray>-</gray> <white>/2fa unblock <player/uuid/discord_id> <gray>— снять блокировку");
+            lines.add(locale.getString("commands.help.unblock", "<gray>- /2fa unblock [player/uuid/discord_id]</gray>"));
         }
         if (sender.hasPermission(RELOAD_PERMISSION)) {
-            lines.add("<gray>-</gray> <white>/2fa reload <gray>— перезагрузить плагин");
+            lines.add(locale.getString("commands.help.reload", "<gray>- /2fa reload</gray>"));
         }
 
         lines.forEach(line -> sender.sendMessage(miniMessage.deserialize(line)));
+    }
+
+    private String applyPlaceholders(String input, final String... placeholders) {
+        for (int i = 0; i + 1 < placeholders.length; i += 2) {
+            input = input.replace(placeholders[i], placeholders[i + 1]);
+        }
+        return input;
     }
 
     private boolean isUuid(final String str) {

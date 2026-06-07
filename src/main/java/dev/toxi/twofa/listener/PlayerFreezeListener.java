@@ -115,8 +115,8 @@ public final class PlayerFreezeListener implements Listener {
     }
 
     private void sendWarnMessage(final Player player) {
-        final String prefix = plugin.getConfigManager().getPluginLocale().getString("prefix", "");
-        final String rawMsg = plugin.getConfigManager().getPluginLocale().getString("messages.actions-blocked", "%prefix%<gradient:#FF4F4F:#FAD7D7>Ошибка →</gradient> <white>Вы не можете совершать действия до прохождения 2FA!");
+        final String prefix = plugin.getConfigManager().getLocale().getString("prefix", "");
+        final String rawMsg = plugin.getConfigManager().getLocale().getString("messages.actions-blocked", "%prefix%<red>Error:</red> <gray>You cannot do that until 2FA is completed.</gray>");
         player.sendMessage(miniMessage.deserialize(rawMsg.replace("%prefix%", prefix)));
     }
 }

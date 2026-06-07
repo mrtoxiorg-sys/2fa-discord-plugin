@@ -1,0 +1,126 @@
+prefix: '<green>[2FA]</green> <gray>'
+
+messages:
+  no-permission: '%prefix%<red>Ошибка:</red> <gray>У вас нет прав.</gray>'
+  only-players: '%prefix%<red>Ошибка:</red> <gray>Эта команда доступна только игрокам.</gray>'
+  player-not-found: '%prefix%<red>Ошибка:</red> <gray>Неизвестная подкоманда или игрок не найден.</gray>'
+  configs-reloaded: '%prefix%<green>Готово:</green> <gray>Конфигурация успешно перезагружена.</gray>'
+
+  already-linked: '%prefix%<red>Ошибка:</red> <gray>Ваш аккаунт уже привязан к Discord 2FA.</gray>'
+  link-code-received: '%prefix%<green>Привязка:</green> <gray>Ваш код подтверждения: <green><bold>%code%</bold></green>. Отправьте его боту в личные сообщения Discord. Код действует 1 минуту.</gray>'
+  link-success: '%prefix%<green>Привязано:</green> <gray>Ваш Minecraft-аккаунт теперь связан с Discord.</gray>'
+
+  auth-required: '%prefix%<green>Подтвердите:</green> <gray>Подтвердите вход через Discord.</gray>'
+  auth-success: '%prefix%<green>Успешно:</green> <gray>Вход подтвержден. Приятной игры.</gray>'
+  actions-blocked: '%prefix%<red>Ошибка:</red> <gray>Вы не можете выполнять это действие, пока не завершите 2FA.</gray>'
+
+  banned-kick: |-
+    <red>[2FA]</red>
+
+    <gray>Ваш аккаунт был заблокирован через Discord 2FA.</gray>
+    <gray>Обратитесь в поддержку для восстановления доступа.</gray>
+  auth-kick-reason: |-
+    <red>[2FA]</red>
+
+    <gray>Ваш вход был отклонен через Discord.</gray>
+  auth-kick-blocked: |-
+    <red>[2FA]</red>
+
+    <gray>Этот аккаунт был заблокирован через Discord 2FA.</gray>
+    <gray>Обратитесь в поддержку для восстановления доступа.</gray>
+  dm-failed: |-
+    <red>[2FA]</red>
+
+    <gray>Бот не смог отправить вам сообщение в Discord.</gray>
+    <gray>Откройте личные сообщения и попробуйте войти снова.</gray>
+  bot-not-ready: |-
+    <red>[2FA]</red>
+
+    <gray>Система защиты еще запускается.</gray>
+    <gray>Подождите около минуты и попробуйте снова.</gray>
+
+commands:
+  usage:
+    disable: '%prefix%<red>Использование:</red> <gray>/2fa disable [player/uuid/discord_id]</gray>'
+    unblock: '%prefix%<red>Использование:</red> <gray>/2fa unblock [player/uuid/discord_id]</gray>'
+  progress:
+    disable-search: '%prefix%<gray>Асинхронно ищем связь и отключаем 2FA...</gray>'
+    unblock-search: '%prefix%<gray>Асинхронно ищем блокировку и снимаем ее...</gray>'
+  result:
+    disable-success-uuid: '%prefix%<green>Готово:</green> <gray>Привязка 2FA удалена по UUID.</gray>'
+    disable-success-discord: '%prefix%<green>Готово:</green> <gray>Привязка 2FA удалена по Discord ID.</gray>'
+    disable-failed: '%prefix%<red>Ошибка:</red> <gray>Связь 2FA не найдена или не была удалена.</gray>'
+    unblock-success-uuid: '%prefix%<green>Готово:</green> <gray>Аккаунт разблокирован по UUID.</gray>'
+    unblock-success-discord: '%prefix%<green>Готово:</green> <gray>Аккаунт разблокирован по Discord ID.</gray>'
+    unblock-failed: '%prefix%<red>Ошибка:</red> <gray>Блокировка не найдена или не была снята.</gray>'
+    target-invalid: '%prefix%<red>Ошибка:</red> <gray>Не удалось определить цель. Игрок мог никогда не заходить или ID некорректен.</gray>'
+    target-invalid-short: '%prefix%<red>Ошибка:</red> <gray>Не удалось определить цель.</gray>'
+  help:
+    header: '<green>[2FA]</green> <gray>Доступные команды:</gray>'
+    enable: '<gray>-</gray> <green>/2fa enable</green> <gray>привязать Minecraft-аккаунт к Discord</gray>'
+    disable: '<gray>-</gray> <green>/2fa disable [player/uuid/discord_id]</green> <gray>отключить 2FA у игрока</gray>'
+    unblock: '<gray>-</gray> <green>/2fa unblock [player/uuid/discord_id]</green> <gray>снять блокировку 2FA</gray>'
+    reload: '<gray>-</gray> <green>/2fa reload</green> <gray>перезагрузить конфигурацию и сервисы</gray>'
+
+discord:
+  messages:
+    database-save-error: 'Произошла ошибка при сохранении данных Minecraft-аккаунта. Обратитесь к администратору.'
+  auth-request:
+    title: 'Запрос на вход через 2FA'
+    description: |-
+      Игрок **%player%** пытается войти в ваш аккаунт.
+
+      **IP-адрес:** `%ip%`
+
+      Если это не вы, сразу отклоните вход.
+    color: '#22C55E'
+    buttons:
+      approve: 'Подтвердить вход'
+      kick: 'Кикнуть игрока'
+      block: 'Заблокировать аккаунт'
+  embeds:
+    link-success:
+      title: 'Аккаунт привязан'
+      description: |-
+        Ваш Minecraft-аккаунт теперь привязан к Discord.
+
+        Следующие входы нужно будет подтверждать через Discord.
+      color: '#22C55E'
+    link-expired:
+      title: 'Ошибка привязки'
+      description: |-
+        Код не найден или уже истек.
+
+        Снова выполните `/2fa enable` в игре, чтобы получить новый код.
+      color: '#EF4444'
+    unlink-notify:
+      title: '2FA отключена'
+      description: 'Администратор отключил Discord 2FA для вашего Minecraft-аккаунта.'
+      color: '#9CA3AF'
+    unban-notify:
+      title: 'Аккаунт разблокирован'
+      description: |-
+        Администратор снял блокировку входа с вашего аккаунта.
+
+        Теперь вы можете снова войти.
+      color: '#22C55E'
+  interaction:
+    status-field: 'Статус действия'
+    already-approved:
+      value: 'Этот вход уже был подтвержден ранее.'
+      color: '#9CA3AF'
+    approved:
+      value: 'Вход для этого игрока был успешно подтвержден.'
+      color: '#22C55E'
+    player-offline:
+      value: 'Запрос больше не активен, потому что игрок уже вышел с сервера.'
+      color: '#9CA3AF'
+    kicked:
+      value: 'Игрок был успешно кикнут с сервера.'
+      color: '#22C55E'
+    kick-failed-offline:
+      value: 'Игрока не удалось кикнуть, потому что он уже не в сети.'
+      color: '#9CA3AF'
+    blocked:
+      value: 'Аккаунт добавлен в блоклист плагина, вход теперь запрещен.'
+      color: '#EF4444'

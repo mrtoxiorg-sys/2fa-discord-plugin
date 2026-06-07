@@ -22,7 +22,7 @@ public final class DiscordEmbedService {
         try {
             return Color.decode(colorStr);
         } catch (NumberFormatException e) {
-            return Color.decode("#4FD6FF"); // Дефолтный голубой цвет
+            return Color.decode("#22C55E");
         }
     }
 
@@ -30,15 +30,15 @@ public final class DiscordEmbedService {
      * Создает Embed-запрос на авторизацию 2FA (Вход на сервер) с интерактивными кнопками.
      */
     public static MessageCreateData createAuthRequest(final TwoFactorPlugin plugin, final UUID uuid, final String playerName, final String ip) {
-        final FileConfiguration locale = plugin.getConfigManager().getDiscordLocale();
+        final FileConfiguration locale = plugin.getConfigManager().getLocale();
 
-        final String path = "auth-request.";
-        final String title = locale.getString(path + "title", "Попытка входа на сервер")
+        final String path = "discord.auth-request.";
+        final String title = locale.getString(path + "title", "Login attempt")
                 .replace("%player%", playerName);
-        final String desc = locale.getString(path + "description", "Игрок **%player%** пытается зайти под вашим аккаунтом.\n\n**IP-Адрес:** `%ip%`")
+        final String desc = locale.getString(path + "description", "Player **%player%** is trying to log into your account.\n\n**IP Address:** `%ip%`")
                 .replace("%player%", playerName)
                 .replace("%ip%", ip);
-        final Color color = parseColor(locale.getString(path + "color", "#FF9F4F"));
+        final Color color = parseColor(locale.getString(path + "color", "#22C55E"));
 
         final EmbedBuilder embed = new EmbedBuilder()
                 .setTitle(title)
@@ -47,9 +47,9 @@ public final class DiscordEmbedService {
                 .setTimestamp(java.time.Instant.now());
 
         // Названия кнопок из конфига
-        final String btnApprove = locale.getString(path + "buttons.approve", "Одобрить вход");
-        final String btnKick = locale.getString(path + "buttons.kick", "Кикнуть");
-        final String btnBlock = locale.getString(path + "buttons.block", "Заблокировать");
+        final String btnApprove = locale.getString(path + "buttons.approve", "Approve");
+        final String btnKick = locale.getString(path + "buttons.kick", "Kick");
+        final String btnBlock = locale.getString(path + "buttons.block", "Block");
 
         // Упаковываем кнопки с уникальными ID, несущими информацию о UUID игрока
         final ActionRow actionRow = ActionRow.of(
@@ -68,11 +68,12 @@ public final class DiscordEmbedService {
      * Одноцветный информационный Embed (например, успешная привязка, бан и т.д.)
      */
     public static MessageCreateData createSimpleEmbed(final TwoFactorPlugin plugin, final String configPath, final String... placeholders) {
-        final FileConfiguration locale = plugin.getConfigManager().getDiscordLocale();
+        final FileConfiguration locale = plugin.getConfigManager().getLocale();
+        final String path = "discord.embeds." + configPath + ".";
 
-        String title = locale.getString(configPath + ".title", "Уведомление");
-        String desc = locale.getString(configPath + ".description", "");
-        final Color color = parseColor(locale.getString(configPath + ".color", "#4FD6FF"));
+        String title = locale.getString(path + "title", "Notification");
+        String desc = locale.getString(path + "description", "");
+        final Color color = parseColor(locale.getString(path + "color", "#22C55E"));
 
         // Замена плейсхолдеров (передаются парами: ключ, значение, ключ, значение...)
         for (int i = 0; i < placeholders.length; i += 2) {

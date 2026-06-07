@@ -13,7 +13,7 @@ commands:
   2fa:
     description: "Главная команда двухфакторной авторизации"
     aliases: [auth, verify]
-    usage: "/2fa <enable|disable|unblock|reload>"
+    usage: "/2fa [enable|disable|unblock|reload]"
 
 # Описание прав доступа для плагинов разрешений (например, LuckPerms)
 permissions:
