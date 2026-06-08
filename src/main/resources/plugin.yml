@@ -8,6 +8,13 @@ load: POSTWORLD
 
 authors: [ TheToxi_LSD ]
 
+libraries:
+  - com.zaxxer:HikariCP:${hikariVersion}
+  - org.xerial:sqlite-jdbc:${sqliteJdbcVersion}
+  - net.dv8tion:JDA:${jdaVersion}
+  - org.postgresql:postgresql:${postgresqlVersion}
+  - com.mysql:mysql-connector-j:${mysqlVersion}
+
 # Регистрация команд сервера
 commands:
   2fa:

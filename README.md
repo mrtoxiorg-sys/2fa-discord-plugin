@@ -65,7 +65,7 @@ Default locale: `en_us`
 ### Build
 
 ```bash
-sh gradlew shadowJar
+sh gradlew jar
 ```
 
 Result:
@@ -76,13 +76,15 @@ build/libs/2fa-1.0-SNAPSHOT.jar
 
 ### Installation
 
-1. Build the plugin with `shadowJar`
+1. Build the plugin with `jar`
 2. Put the jar into your Paper server `plugins/` folder
 3. Start the server once
 4. Open the generated `config.yml`
 5. Set your Discord bot token
 6. Adjust database and locale settings if needed
 7. Restart the server
+
+On the first startup, Paper-compatible servers will download the required libraries automatically.
 
 ### Disclaimer
 
@@ -160,7 +162,7 @@ You use, modify, and distribute this code at your own risk.
 ### Сборка
 
 ```bash
-sh gradlew shadowJar
+sh gradlew jar
 ```
 
 Результат:
@@ -171,13 +173,15 @@ build/libs/2fa-1.0-SNAPSHOT.jar
 
 ### Установка
 
-1. Соберите плагин через `shadowJar`
+1. Соберите плагин через `jar`
 2. Поместите jar-файл в папку `plugins/` вашего Paper-сервера
 3. Один раз запустите сервер
 4. Откройте сгенерированный `config.yml`
 5. Укажите токен Discord-бота
 6. При необходимости настройте базу данных и локаль
 7. Перезапустите сервер
+
+При первом запуске Paper-совместимый сервер автоматически скачает необходимые библиотеки.
 
 ### Отказ от гарантий
 

@@ -1,6 +1,5 @@
 plugins {
     java
-    id("com.gradleup.shadow") version "8.3.8"
     id("java-library")
     id("xyz.jpenilla.run-paper") version "3.0.2"
 }
@@ -8,19 +7,27 @@ plugins {
 group = "dev.toxi"
 version = "1.0-SNAPSHOT"
 
+val paperApiVersion = "1.21.1-R0.1-SNAPSHOT"
+val hikariVersion = "5.1.0"
+val sqliteJdbcVersion = "3.46.1.3"
+val jdaVersion = "5.0.0"
+val postgresqlVersion = "42.7.4"
+val mysqlVersion = "9.0.0"
+val annotationsVersion = "24.1.0"
+
 repositories {
     mavenCentral()
     maven("https://repo.papermc.io/repository/maven-public/")
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
-    implementation("com.zaxxer:HikariCP:5.1.0")
-    implementation("org.xerial:sqlite-jdbc:3.46.1.3")
-    compileOnly("org.jetbrains:annotations:24.1.0")
-    runtimeOnly("org.postgresql:postgresql:42.7.4")
-    runtimeOnly("com.mysql:mysql-connector-j:9.0.0")
-    implementation("net.dv8tion:JDA:5.0.0") {
+    compileOnly("io.papermc.paper:paper-api:$paperApiVersion")
+    compileOnly("com.zaxxer:HikariCP:$hikariVersion")
+    compileOnly("org.xerial:sqlite-jdbc:$sqliteJdbcVersion")
+    compileOnly("org.jetbrains:annotations:$annotationsVersion")
+    compileOnly("org.postgresql:postgresql:$postgresqlVersion")
+    compileOnly("com.mysql:mysql-connector-j:$mysqlVersion")
+    compileOnly("net.dv8tion:JDA:$jdaVersion") {
         exclude(module = "opus-java")
     }
 }
@@ -35,26 +42,16 @@ tasks {
         options.release.set(21)
     }
 
-    assemble {
-        dependsOn(shadowJar)
-    }
-
-    shadowJar {
-        archiveClassifier.set("")
-
-        val prefix = "dev.toxi.twofa.libs"
-        relocate("com.zaxxer.hikari", "$prefix.hikari")
-        relocate("net.dv8tion.jda", "$prefix.jda")
-        relocate("org.apache.commons", "$prefix.commons")
-        relocate("okhttp3", "$prefix.okhttp")
-        relocate("okio", "$prefix.okio")
-        relocate("com.neovisionaries", "$prefix.neovisionaries")
-        relocate("com.fasterxml.jackson", "$prefix.jackson")
-        relocate("gnu.trove", "$prefix.trove")
-    }
-
     processResources {
-        val props = mapOf("version" to version, "description" to project.description)
+        val props = mapOf(
+            "version" to version,
+            "description" to project.description,
+            "hikariVersion" to hikariVersion,
+            "sqliteJdbcVersion" to sqliteJdbcVersion,
+            "jdaVersion" to jdaVersion,
+            "postgresqlVersion" to postgresqlVersion,
+            "mysqlVersion" to mysqlVersion,
+        )
         filesMatching("plugin.yml") {
             expand(props)
         }
