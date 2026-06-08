@@ -2,7 +2,6 @@
 
 Universal Discord-based 2FA plugin for Paper servers.
 
-Русский и English собраны в одном README, чтобы проект было удобно читать сразу в обеих версиях.
 
 ## English
 
